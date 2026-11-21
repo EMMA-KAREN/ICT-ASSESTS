@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KSTVET ICT Asset Tracking System - GROUP TWO</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="loginPage" class="login-container">
+<div class="login-box">
+<h1>KSTVET</h1>
+<h2>ICT Asset Tracking System</h2>
+<p>GROUP TWO - Kenya School of TVET</p>
+<form id="loginForm">
+<input type="text" id="username" value="admin" required placeholder="Username">
+<input type="password" id="password" value="admin123" required placeholder="Password">
+<select id="userRole"><option>System Administrator</option><option>ICT Officer</option><option>Procurement Officer</option><option>Lab Personnel</option><option>Management</option></select>
+<button type="submit">Login</button>
+</form>
+<p class="hint">Demo: admin/admin123 | ict/ict123 | procurement/proc123</p>
+</div>
+</div>
+
+<div id="app" class="hidden">
+<header>
+<div class="brand"><h1>KSTVET ICT ASSET TRACKING</h1><span>GROUP TWO: Stanley Kimeto, Maryclaret Archie, Angella Kangi, Alex Munene, Mary Maina, Erastus Yator | Langata Road</span></div>
+<div class="user-info"><span id="loggedUser"></span> <button onclick="logout()">Logout</button></div>
+</header>
+<nav>
+<button class="tab active" data-tab="dashboard">Dashboard</button>
+<button class="tab" data-tab="procurement">Procurement</button>
+<button class="tab" data-tab="assets">Assets</button>
+<button class="tab" data-tab="allocation">Allocation</button>
+<button class="tab" data-tab="movement">Movement</button>
+<button class="tab" data-tab="maintenance">Maintenance</button>
+<button class="tab" data-tab="disposal">Disposal</button>
+<button class="tab" data-tab="reports">Reports & Search</button>
+<button class="tab" data-tab="users">Users & Logs</button>
+</nav>
+<main>
+<section id="dashboard" class="panel active">
+<h2>Dashboard - 2.1.4 Module Design</h2>
+<div class="cards">
+<div class="card"><h3 id="totalAssets">0</h3><p>Total Assets</p></div>
+<div class="card"><h3 id="activeAssets">0</h3><p>Active</p></div>
+<div class="card"><h3 id="maintAssets">0</h3><p>Under Maintenance</p></div>
+<div class="card"><h3 id="disposedCount">0</h3><p>Disposed</p></div>
+<div class="card"><h3 id="totalProc">0</h3><p>Procurements</p></div>
+<div class="card"><h3 id="moveCount">0</h3><p>Movements</p></div>
+</div>
+<div id="warrantyAlert" class="alert"></div>
+<h3>Recent Assets (Last 5)</h3>
+<table id="recentTable"><thead><tr><th>Asset No</th><th>Serial</th><th>Type</th><th>Location</th><th>Custodian</th><th>Status</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="procurement" class="panel">
+<h2>Procurement - Table 4: Procurement (from 2.1.1)</h2>
+<form id="procForm" class="grid-form">
+<input type="hidden" id="procId">
+<div><label>Supplier Name *</label><input required id="supplierName"></div>
+<div><label>Supplier Contact</label><input id="supplierContact"></div>
+<div><label>Purchase Order No * Unique</label><input required id="poNumber"></div>
+<div><label>Purchase Date *</label><input type="date" required id="purchaseDate"></div>
+<div><label>Receiving Date *</label><input type="date" required id="receivingDate"></div>
+<div><label>Total Cost KSh * >=0</label><input type="number" min="0" required id="totalCost"></div>
+<div><label>Warranty Expiry</label><input type="date" id="warrantyExpiry"></div>
+<div class="full"><label>Notes (Goods Received Check)</label><textarea id="procNotes"></textarea></div>
+<button type="submit" class="btn">Save Procurement</button><button type="reset" class="btn secondary">Clear</button>
+</form>
+<table id="procTable"><thead><tr><th>PO No</th><th>Supplier</th><th>Purchase Date</th><th>Cost</th><th>Warranty</th><th>Action</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="assets" class="panel">
+<h2>Asset Registration - Table 2: Assets - Validation 2.1.2 Unique</h2>
+<form id="assetForm" class="grid-form">
+<input type="hidden" id="assetDbId">
+<div><label>Asset Number * Unique (KSTVET/ICT/001)</label><input required id="assetNumber"></div>
+<div><label>Serial Number * Unique</label><input required id="serialNumber"></div>
+<div><label>Equipment Type *</label><select required id="assetType"><option>Desktop Computer</option><option>Laptop</option><option>Printer</option><option>Projector</option><option>Networking Device</option><option>Server</option><option>UPS Device</option><option>Laboratory Accessory</option></select></div>
+<div><label>Description</label><input id="assetDesc"></div>
+<div><label>Manufacturer</label><input id="manufacturer"></div>
+<div><label>Model</label><input id="model"></div>
+<div><label>Acquisition Date *</label><input type="date" required id="acqDate"></div>
+<div><label>Purchase Cost KSh *</label><input type="number" min="0" required id="assetCost"></div>
+<div><label>Condition *</label><select id="condition"><option>New</option><option>Good</option><option>Fair</option><option>Damaged</option><option>Obsolete</option></select></div>
+<div><label>Status *</label><select id="assetStatus"><option>Active</option><option>Under Maintenance</option><option>Disposed</option><option>Missing</option></select></div>
+<div><label>Initial Location * Table 5</label><input required id="initLocation" placeholder="Computer Lab 1"></div>
+<div><label>PO Link</label><select id="assetPO"></select></div>
+<div><label>Warranty Details</label><input id="warrantyDetails"></div>
+<button type="submit" class="btn">Save Asset</button><button type="reset" class="btn secondary">Clear</button>
+</form>
+<div class="search-bar"><input id="assetSearch" placeholder="Search Asset No, Serial, Type, Location..." oninput="renderAssets()"></div>
+<table id="assetTable"><thead><tr><th>Asset No</th><th>Serial</th><th>Type</th><th>Location</th><th>Condition</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="allocation" class="panel">
+<h2>Allocation & Returns - Table 6: Allocations</h2>
+<form id="allocForm" class="grid-form">
+<div><label>Asset Number *</label><select required id="allocAsset"></select></div>
+<div><label>Location * Table 5</label><input required id="allocLocation"></div>
+<div><label>Department *</label><input required id="allocDept"></div>
+<div><label>Custodian Name *</label><input required id="custodianName"></div>
+<div><label>Allocation Date *</label><input type="date" required id="allocDate"></div>
+<div><label>Return Date</label><input type="date" id="returnDate"></div>
+<div><label>Approved By *</label><input required id="allocApproved"></div>
+<button type="submit" class="btn">Allocate Asset</button>
+</form>
+<table id="allocTable"><thead><tr><th>Asset</th><th>Location</th><th>Dept</th><th>Custodian</th><th>Date</th><th>Return</th><th>Approved</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="movement" class="panel">
+<h2>Movement Tracking - Table 7: Movements - Preserves History 3.1.2</h2>
+<form id="moveForm" class="grid-form">
+<div><label>Asset Number *</label><select required id="moveAsset"></select></div>
+<div><label>Previous Location (auto)</label><input id="prevLoc" readonly></div>
+<div><label>New Location *</label><input required id="newLoc"></div>
+<div><label>Movement Date *</label><input type="date" required id="moveDate"></div>
+<div><label>Reason for Movement *</label><input required id="moveReason"></div>
+<div><label>Authorized By *</label><input required id="moveAuth"></div>
+<button type="submit" class="btn">Record Movement</button>
+</form>
+<table id="moveTable"><thead><tr><th>Asset</th><th>Previous → New</th><th>Date</th><th>Reason</th><th>Auth</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="maintenance" class="panel">
+<h2>Maintenance & Repair - Table 8: Maintenance</h2>
+<form id="maintForm" class="grid-form">
+<div><label>Asset Number *</label><select required id="maintAsset"></select></div>
+<div><label>Fault Description *</label><input required id="faultDesc"></div>
+<div><label>Date Reported *</label><input type="date" required id="dateReported"></div>
+<div><label>Technician *</label><input required id="technician"></div>
+<div><label>Repair Date</label><input type="date" id="repairDate"></div>
+<div><label>Action Taken</label><input id="actionTaken"></div>
+<div><label>Parts Replaced</label><input id="partsReplaced"></div>
+<div><label>Cost KSh</label><input type="number" min="0" id="maintCost"></div>
+<div><label>Status *</label><select id="maintStatus"><option>Open</option><option>In Progress</option><option>Completed</option><option>Needs Replacement</option></select></div>
+<button type="submit" class="btn">Save Maintenance</button>
+</form>
+<table id="maintTable"><thead><tr><th>Asset</th><th>Fault</th><th>Reported</th><th>Technician</th><th>Cost</th><th>Status</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="disposal" class="panel">
+<h2>Disposal Management - Table 9: Disposals</h2>
+<form id="disposalForm" class="grid-form">
+<div><label>Asset Number *</label><select required id="dispAsset"></select></div>
+<div><label>Disposal Date *</label><input type="date" required id="dispDate"></div>
+<div><label>Reason for Disposal *</label><input required id="dispReason"></div>
+<div><label>Condition (auto)</label><input id="dispCondition" readonly></div>
+<div><label>Disposal Method *</label><select id="dispMethod"><option>Donation</option><option>E-Waste Disposal</option><option>Auction</option><option>Destruction</option><option>Storage</option></select></div>
+<div><label>Approved By *</label><input required id="dispApproved"></div>
+<div class="full"><label>Notes</label><textarea id="dispNotes"></textarea></div>
+<button type="submit" class="btn danger">Record Disposal</button>
+</form>
+<table id="dispTable"><thead><tr><th>Asset</th><th>Date</th><th>Reason</th><th>Method</th><th>Approved</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="reports" class="panel">
+<h2>Search, Filtering & Reports - Output Requirements 1.2.9.3</h2>
+<div class="search-bar"><input id="globalSearch" placeholder="Search Asset No, Serial, Type, Location, Custodian, Condition"><select id="filterStatus"><option value="">All Status</option><option>Active</option><option>Under Maintenance</option><option>Disposed</option><option>Missing</option></select><select id="filterType"><option value="">All Types</option><option>Desktop Computer</option><option>Laptop</option><option>Printer</option><option>Projector</option></select><button class="btn" onclick="doSearch()">Search</button><button class="btn secondary" onclick="clearSearch()">Clear</button></div>
+<div class="report-actions"><button class="btn" onclick="genReport('inventory')">Complete Inventory</button><button class="btn" onclick="genReport('byLocation')">By Location</button><button class="btn" onclick="genReport('byCustodian')">By Custodian</button><button class="btn" onclick="genReport('procurement')">Procurement Report</button><button class="btn" onclick="genReport('movement')">Movement History</button><button class="btn" onclick="genReport('maintenance')">Maintenance Report</button><button class="btn" onclick="genReport('disposed')">Disposed Report</button><button class="btn" onclick="genReport('missing')">Missing Assets</button><button class="btn secondary" onclick="printReport()">Print</button><button class="btn secondary" onclick="exportCSV()">Export CSV</button><button class="btn secondary" onclick="backupJSON()">Backup JSON</button></div>
+<div id="reportOutput" class="report-output">Click a report button to generate...</div>
+<table id="reportTable"><thead><tr><th>Asset No</th><th>Serial</th><th>Type</th><th>Location</th><th>Custodian</th><th>Condition</th><th>Status</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="users" class="panel">
+<h2>User Management & Activity Logs - Table 1 & Table 10 - Security 4.1.6 Hashed Passwords</h2>
+<form id="userForm" class="grid-form"><div><label>Username *</label><input required id="newUsername"></div><div><label>Password * Hashed not plain</label><input type="password" required id="newPassword"></div><div><label>Role *</label><select id="newRole"><option>System Administrator</option><option>ICT Officer</option><option>Procurement Officer</option><option>Lab Personnel</option><option>Management</option></select></div><button type="submit" class="btn">Add User</button></form>
+<table id="userTable"><thead><tr><th>Username</th><th>Role</th><th>Created</th></tr></thead><tbody></tbody></table>
+<h3 style="margin-top:14px">Activity Log (Last 20) - Table 10</h3>
+<table id="logTable"><thead><tr><th>Date/Time</th><th>User</th><th>Activity</th><th>Record Type</th><th>Record ID</th></tr></thead><tbody></tbody></table>
+</section>
+</main>
+<footer><p>KSTVET - ICT Equipment & Asset Tracking System | GROUP TWO | Budget KSh 35,000 | Work Plan 6 Weeks | Langata Road, Nairobi</p></footer>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
